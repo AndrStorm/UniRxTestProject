@@ -1,0 +1,77 @@
+using System;
+using UniRx;
+using UnityEngine;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(Button))]
+public class AttackButtonPresenter : MonoBehaviour
+{
+    
+    public IObservable<AttackTypes> OnAttackPerform => _onAttackPerform;
+    private readonly Subject<AttackTypes> _onAttackPerform = new();
+
+    private readonly ReactiveProperty<int> _clickCounter = new();
+    
+    private readonly CompositeDisposable _disposable = new();
+
+    
+    private Button _button;
+
+    public float attackDelay = 1000f;
+    public float doubleClickDelay = 250f;
+    
+    
+    void Start()
+    {
+        _button = GetComponent<Button>();
+        _button.onClick.AddListener(OnClick);
+        
+        _onAttackPerform
+            .Throttle(TimeSpan.FromMilliseconds(attackDelay))
+            .Subscribe(x => _button.interactable = true)
+            .AddTo(_disposable);
+        
+        _clickCounter
+            .Where(x => x == 2)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelay))
+            .Subscribe(x =>
+            {
+                _clickCounter.Value = 0;
+                _onAttackPerform.OnNext(AttackTypes.heavy);
+                _button.interactable = false;
+            })
+            .AddTo(_disposable);
+        
+        
+        _clickCounter
+            .Where(x => x > 0)
+            .Buffer(_clickCounter.Where(x => x > 0).Throttle(TimeSpan.FromMilliseconds(doubleClickDelay)))
+            .Where(x => x.Count < 2)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelay))
+            .Subscribe(x =>
+            {
+                _clickCounter.Value = 0;
+                _onAttackPerform.OnNext(AttackTypes.light);
+                _button.interactable = false;
+            })
+            .AddTo(_disposable);
+    }
+    
+
+    public void OnClick()
+    {
+        _clickCounter.Value++;
+    }
+
+    private void OnDestroy()
+    {
+        _disposable.Dispose();
+    }
+}
+
+public enum AttackTypes
+{
+    light,
+    heavy
+}
+
