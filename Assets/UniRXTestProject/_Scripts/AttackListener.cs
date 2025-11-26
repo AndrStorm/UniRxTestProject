@@ -2,25 +2,43 @@ using System;
 using UniRx;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class AttackListener : IInitializable, IDisposable
 {
     
     private readonly AttackButtonPresenter _attackButtonPresenter;
+    private readonly VfxManager _vfxManager;
+    
     private readonly CompositeDisposable _disposable = new ();
     
     
     [Inject]
-    public AttackListener(AttackButtonPresenter attackButtonPresenter)
+    public AttackListener(AttackButtonPresenter attackButtonPresenter, VfxManager vfxManager)
     {
         _attackButtonPresenter = attackButtonPresenter;
+        _vfxManager = vfxManager;
     }
     
     public void Initialize()
     {
         //срабатывание эффектов
         _attackButtonPresenter.OnAttackPerform
-            .Subscribe(x => Debug.Log($"attack type {x}"))
+            .Where(x => x == AttackTypes.light)
+            .Subscribe(x =>
+            {
+                Debug.Log($"attack type {x}");
+                _vfxManager.PlayLightAttackVfx(Vector3.zero, Quaternion.identity);
+            })
+            .AddTo(_disposable);
+        
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Subscribe(x =>
+            {
+                Debug.Log($"attack type {x}");
+                _vfxManager.PlayHeavyAttackVfx(Vector3.zero, Quaternion.identity);
+            })
             .AddTo(_disposable);
     }
 
