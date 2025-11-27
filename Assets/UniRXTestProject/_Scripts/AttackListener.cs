@@ -27,7 +27,6 @@ public class AttackListener : IInitializable, IDisposable
             .Where(x => x == AttackTypes.light)
             .Subscribe(x =>
             {
-                Debug.Log($"attack type {x}");
                 _vfxManager.PlayLightAttackVfx(Vector3.zero, Quaternion.identity);
             })
             .AddTo(_disposable);
@@ -36,7 +35,6 @@ public class AttackListener : IInitializable, IDisposable
             .Where(x => x == AttackTypes.heavy)
             .Subscribe(x =>
             {
-                Debug.Log($"attack type {x}");
                 _vfxManager.PlayHeavyAttackVfx(Vector3.zero, Quaternion.identity);
             })
             .AddTo(_disposable);
