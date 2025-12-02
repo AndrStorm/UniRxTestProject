@@ -22,7 +22,6 @@ public class AttackListener : IInitializable, IDisposable
     
     public void Initialize()
     {
-        //срабатывание эффектов
         _attackButtonPresenter.OnAttackPerform
             .Where(x => x == AttackTypes.light)
             .Subscribe(x =>
@@ -36,6 +35,13 @@ public class AttackListener : IInitializable, IDisposable
             .Subscribe(x =>
             {
                 _vfxManager.PlayHeavyAttackVfx(Vector3.zero, Quaternion.identity);
+            })
+            .AddTo(_disposable);
+        
+        _attackButtonPresenter.OnAttackPressed
+            .Subscribe(x =>
+            {
+                _vfxManager.PlayAttackPressedVfx();
             })
             .AddTo(_disposable);
     }

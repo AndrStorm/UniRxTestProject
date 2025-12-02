@@ -10,6 +10,9 @@ public class AttackButtonPresenter : MonoBehaviour
     public IObservable<AttackTypes> OnAttackPerform => _onAttackPerform;
     private readonly Subject<AttackTypes> _onAttackPerform = new();
 
+    public IObservable<int> OnAttackPressed => _onAttackPressed;
+    private readonly Subject<int> _onAttackPressed = new();
+    
     private readonly ReactiveProperty<int> _clickCounter = new();
     
     private readonly CompositeDisposable _disposable = new();
@@ -61,6 +64,7 @@ public class AttackButtonPresenter : MonoBehaviour
     public void OnClick()
     {
         _clickCounter.Value++;
+        _onAttackPressed.OnNext(1);
     }
 
     private void OnDestroy()
