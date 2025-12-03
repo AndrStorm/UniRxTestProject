@@ -13,8 +13,10 @@ public class AttackButtonPresenter : MonoBehaviour
     public IObservable<int> OnAttackPressed => _onAttackPressed;
     private readonly Subject<int> _onAttackPressed = new();
     
-    private readonly ReactiveProperty<int> _clickCounter = new();
+    public IObservable<int> OnAttackDelayFinished => _onAttackDelayFinished;
+    private readonly Subject<int> _onAttackDelayFinished = new();
     
+    private readonly ReactiveProperty<int> _clickCounter = new();
     private readonly CompositeDisposable _disposable = new();
 
     
@@ -31,7 +33,11 @@ public class AttackButtonPresenter : MonoBehaviour
         
         _onAttackPerform
             .Throttle(TimeSpan.FromMilliseconds(attackDelay))
-            .Subscribe(x => _button.interactable = true)
+            .Subscribe(x =>
+            {
+                _onAttackDelayFinished.OnNext(1);
+                _button.interactable = true;
+            })
             .AddTo(_disposable);
         
         _clickCounter
