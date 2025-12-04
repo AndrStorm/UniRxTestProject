@@ -5,10 +5,13 @@ using Random = UnityEngine.Random;
 public class VfxManager : MonoBehaviour
 {
     public List<GameObject> lightAttackVfxs;
+    public List<GameObject> heavyAttackVfxs;
     public List<GameObject> uiOnButtonPressedVfxs;
     public Transform uiButtonPressedVfxOrigin;
-
-
+    
+    public Transform SwordTransform;
+    public Transform BowTransform;
+    
     
     public void PlayAttackPressedVfx()
     {
@@ -18,18 +21,24 @@ public class VfxManager : MonoBehaviour
                 Quaternion.identity, uiButtonPressedVfxOrigin);
             var effectPs = effectGO.GetComponent<ParticleSystem>();
             Destroy(effectGO, effectPs.main.duration + effectPs.main.startLifetime.constantMax);
-            
         }
     }
     
-    public void PlayHeavyAttackVfx(Vector3 position, Quaternion rotation)
-    {
-        PlayAttackVfx(lightAttackVfxs[Random.Range(0,2)], position, rotation);
-    }
     
-    public void PlayLightAttackVfx(Vector3 position, Quaternion rotation)
+    private int _heavyAttackCounter;
+    public void PlayHeavyAttackVfx()
     {
-        PlayAttackVfx(lightAttackVfxs[2], position, rotation);
+        //PlayAttackVfx(lightAttackVfxs[Random.Range(0,2)], BowTransform.position, Quaternion.identity);
+        PlayAttackVfx(heavyAttackVfxs[_heavyAttackCounter++ % heavyAttackVfxs.Count],
+            BowTransform.position, Quaternion.Euler(-90, 0, 0));
+    }
+
+    private int _lightAttackCounter;
+    public void PlayLightAttackVfx()
+    {
+        //PlayAttackVfx(lightAttackVfxs[2], SwordTransform.position, Quaternion.identity);
+        PlayAttackVfx(lightAttackVfxs[_lightAttackCounter++ % lightAttackVfxs.Count],
+            SwordTransform.position, Quaternion.identity);
     }
     
     

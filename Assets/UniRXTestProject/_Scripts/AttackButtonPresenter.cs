@@ -22,7 +22,8 @@ public class AttackButtonPresenter : MonoBehaviour
     
     private Button _button;
 
-    public float attackDelay = 1000f;
+    public float attackDelayLight = 500f;
+    public float attackDelayHeavy = 1000f;
     public float doubleClickDelay = 250f;
     
     
@@ -32,7 +33,8 @@ public class AttackButtonPresenter : MonoBehaviour
         _button.onClick.AddListener(OnClick);
         
         _onAttackPerform
-            .Throttle(TimeSpan.FromMilliseconds(attackDelay))
+            .Where(x => x == AttackTypes.light)
+            .Throttle(TimeSpan.FromMilliseconds(attackDelayLight))
             .Subscribe(x =>
             {
                 _onAttackDelayFinished.OnNext(1);
@@ -40,9 +42,21 @@ public class AttackButtonPresenter : MonoBehaviour
             })
             .AddTo(_disposable);
         
+        _onAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Throttle(TimeSpan.FromMilliseconds(attackDelayHeavy))
+            .Subscribe(x =>
+            {
+                _onAttackDelayFinished.OnNext(1);
+                _button.interactable = true;
+            })
+            .AddTo(_disposable);
+        
+        
+        
         _clickCounter
             .Where(x => x == 2)
-            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelay))
+            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelayHeavy))
             .Subscribe(x =>
             {
                 _clickCounter.Value = 0;
@@ -56,7 +70,7 @@ public class AttackButtonPresenter : MonoBehaviour
             .Where(x => x > 0)
             .Buffer(_clickCounter.Where(x => x > 0).Throttle(TimeSpan.FromMilliseconds(doubleClickDelay)))
             .Where(x => x.Count < 2)
-            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelay))
+            .ThrottleFirst(TimeSpan.FromMilliseconds(attackDelayLight))
             .Subscribe(x =>
             {
                 _clickCounter.Value = 0;
