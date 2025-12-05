@@ -40,6 +40,7 @@ public class AttackListener : IInitializable, IDisposable
             {
                 _vfxManager.PlayLightAttackVfx();
                 _player.Animator.SetBool(IsLightAttack, false);
+                
             })
             .AddTo(_disposable);
         

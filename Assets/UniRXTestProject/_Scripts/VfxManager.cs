@@ -30,7 +30,7 @@ public class VfxManager : MonoBehaviour
     {
         //PlayAttackVfx(lightAttackVfxs[Random.Range(0,2)], BowTransform.position, Quaternion.identity);
         PlayAttackVfx(heavyAttackVfxs[_heavyAttackCounter++ % heavyAttackVfxs.Count],
-            BowTransform.position, Quaternion.Euler(-90, 0, 0));
+            BowTransform.position, Quaternion.identity);
     }
 
     private int _lightAttackCounter;
@@ -47,6 +47,8 @@ public class VfxManager : MonoBehaviour
     private void PlayAttackVfx(GameObject vfx, Vector3 position, Quaternion rotation)
     {
         var vfxGO = Instantiate(vfx, position, rotation);
+        
+        //vfxGO.GetComponent<ParticleSystem>().main.simulationSpeed;
         Destroy(vfxGO, 2f);
     }
 }
