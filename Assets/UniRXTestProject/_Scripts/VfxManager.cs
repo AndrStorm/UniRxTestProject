@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class VfxManager : MonoBehaviour
 {
@@ -28,7 +27,6 @@ public class VfxManager : MonoBehaviour
     private int _heavyAttackCounter;
     public void PlayHeavyAttackVfx()
     {
-        //PlayAttackVfx(lightAttackVfxs[Random.Range(0,2)], BowTransform.position, Quaternion.identity);
         PlayAttackVfx(heavyAttackVfxs[_heavyAttackCounter++ % heavyAttackVfxs.Count],
             BowTransform.position, Quaternion.identity);
     }
@@ -36,7 +34,6 @@ public class VfxManager : MonoBehaviour
     private int _lightAttackCounter;
     public void PlayLightAttackVfx()
     {
-        //PlayAttackVfx(lightAttackVfxs[2], SwordTransform.position, Quaternion.identity);
         PlayAttackVfx(lightAttackVfxs[_lightAttackCounter++ % lightAttackVfxs.Count],
             SwordTransform.position, Quaternion.identity);
     }
@@ -47,8 +44,6 @@ public class VfxManager : MonoBehaviour
     private void PlayAttackVfx(GameObject vfx, Vector3 position, Quaternion rotation)
     {
         var vfxGO = Instantiate(vfx, position, rotation);
-        
-        //vfxGO.GetComponent<ParticleSystem>().main.simulationSpeed;
         Destroy(vfxGO, 2f);
     }
 }

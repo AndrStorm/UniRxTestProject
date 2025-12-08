@@ -1847,9 +1847,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f661863ac32cc454cbbf7f2d935bc17e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackDelayLight: 600
-  attackDelayHeavy: 1200
-  doubleClickDelay: 300
 --- !u!114 &1901138146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2050,6 +2047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12d1fa4931a41d4e9ce867a258b105b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameSettingsSO: {fileID: 11400000, guid: 4615ab27bce4b894c8b3e43a45d1b6ff, type: 2}
   _player: {fileID: 4087325323830914}
   _attackButtonPresenter: {fileID: 1901138145}
   _vfxManager: {fileID: 2072616308}
@@ -20881,6 +20879,10 @@ PrefabInstance:
     - target: {fileID: 1397200024942211890, guid: 3f578386a5129b046a43555f12a4fc20, type: 3}
       propertyPath: m_Name
       value: Vortex1_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1397200024942211890, guid: 3f578386a5129b046a43555f12a4fc20, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

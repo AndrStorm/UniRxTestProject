@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6403e5c74de892428b93cd6373ba9b7, type: 3}
+  m_Name: GameSettingsSO
+  m_EditorClassIdentifier: 
+  AttackDelayLight: 350
+  AttackDelayHeavy: 900
+  DoubleClickDelay: 250
+  LightAttackVfxDelay: 120
+  HeavyAttackVfxDelay: 500
+  HighlightOnInterval: 10
+  HighlightOffInterval: 15
+  HighlightOffPressedMul: 0.5
+  HighlightDeltaPerInterval: 0.05

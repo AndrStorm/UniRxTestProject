@@ -9,15 +9,20 @@ public class AttackListener : IInitializable, IDisposable
     private readonly VfxManager _vfxManager;
     private readonly Player _player;
     
-    private readonly CompositeDisposable _disposable = new ();
+    private CompositeDisposable _disposable;
+    private GameSettingsSO _settings;
     
     private static readonly int IsLightAttack = Animator.StringToHash("IsLightAttack");
     private static readonly int IsHeavyAttack = Animator.StringToHash("IsHeavyAttack");
-    
+
+    private int _LightAttackVfxDelay;
+    private int _HeavyAttackVfxDelay;
     
     [Inject]
-    public AttackListener(AttackButtonPresenter attackButtonPresenter, VfxManager vfxManager, Player player)
+    public AttackListener(GameSettingsSO gameSettingsSo, AttackButtonPresenter attackButtonPresenter,
+        VfxManager vfxManager, Player player)
     {
+        _settings = gameSettingsSo;
         _attackButtonPresenter = attackButtonPresenter;
         _vfxManager = vfxManager;
         _player = player;
@@ -25,6 +30,15 @@ public class AttackListener : IInitializable, IDisposable
     
     public void Initialize()
     {
+        _disposable?.Dispose();
+        _disposable = new CompositeDisposable();
+        _LightAttackVfxDelay = _settings.LightAttackVfxDelay;
+        _HeavyAttackVfxDelay = _settings.HeavyAttackVfxDelay;
+
+#if UNITY_EDITOR
+        ReinitSettings();
+#endif
+        
         _attackButtonPresenter.OnAttackPerform
             .Where(x => x == AttackTypes.light)
             .Subscribe(x =>
@@ -35,7 +49,7 @@ public class AttackListener : IInitializable, IDisposable
         
         _attackButtonPresenter.OnAttackPerform
             .Where(x => x == AttackTypes.light)
-            .Throttle(TimeSpan.FromMilliseconds(200))
+            .Throttle(TimeSpan.FromMilliseconds(_LightAttackVfxDelay))
             .Subscribe(x =>
             {
                 _vfxManager.PlayLightAttackVfx();
@@ -55,7 +69,7 @@ public class AttackListener : IInitializable, IDisposable
         
         _attackButtonPresenter.OnAttackPerform
             .Where(x => x == AttackTypes.heavy)
-            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Throttle(TimeSpan.FromMilliseconds(_HeavyAttackVfxDelay))
             .Subscribe(x =>
             {
                 _vfxManager.PlayHeavyAttackVfx();
@@ -64,14 +78,34 @@ public class AttackListener : IInitializable, IDisposable
             .AddTo(_disposable);
         
         
-        
-        
         _attackButtonPresenter.OnAttackPressed
             .Subscribe(x =>
             {
                 _vfxManager.PlayAttackPressedVfx();
             })
             .AddTo(_disposable);
+    }
+    
+    private void ReinitSettings()
+    {
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.light)
+            .Throttle(TimeSpan.FromMilliseconds(_LightAttackVfxDelay + 1))
+            .Subscribe(x =>
+            {
+                Initialize();
+            })
+            .AddTo(_disposable);
+        
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Throttle(TimeSpan.FromMilliseconds(_HeavyAttackVfxDelay + 1))
+            .Subscribe(x =>
+            {
+                Initialize();
+            })
+            .AddTo(_disposable);
+        
     }
 
     public void Dispose()
