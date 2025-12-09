@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6403e5c74de892428b93cd6373ba9b7, type: 3}
   m_Name: GameSettingsSO
   m_EditorClassIdentifier: 
-  AttackDelayLight: 350
+  AttackDelayLight: 300
   AttackDelayHeavy: 900
   DoubleClickDelay: 250
   LightAttackVfxDelay: 120

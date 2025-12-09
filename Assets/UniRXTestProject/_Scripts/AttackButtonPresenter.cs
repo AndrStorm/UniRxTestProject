@@ -61,49 +61,8 @@ public class AttackButtonPresenter : MonoBehaviour
         ReinitSettings();
 #endif
         
-        _onAttackPerform
-            .Where(x => x == AttackTypes.light)
-            .Throttle(TimeSpan.FromMilliseconds(_AttackDelayLight))
-            .Subscribe(x => { FinishAttackDelay(); })
-            .AddTo(_disposable);
-        
-        _onAttackPerform
-            .Where(x => x == AttackTypes.heavy)
-            .Throttle(TimeSpan.FromMilliseconds(_AttackDelayHeavy))
-            .Subscribe(x => { FinishAttackDelay(); })
-            .AddTo(_disposable);
-        
-        
-        _clickCounter
-            .Where(x => x == 2)
-            .ThrottleFirst(TimeSpan.FromMilliseconds(_AttackDelayHeavy))
-            .Subscribe(x =>
-            {
-                _clickCounter.Value = 0;
-                _onAttackPerform.OnNext(AttackTypes.heavy);
-                _button.interactable = false;
-            })
-            .AddTo(_disposable);
-        
-        
-        _clickCounter
-            .Where(x => x > 0)
-            .Buffer(_clickCounter.Where(x => x > 0).Throttle(TimeSpan.FromMilliseconds(_DoubleClickDelay)))
-            .Where(x => x.Count < 2)
-            .ThrottleFirst(TimeSpan.FromMilliseconds(_AttackDelayLight))
-            .Subscribe(x =>
-            {
-                _clickCounter.Value = 0;
-                _onAttackPerform.OnNext(AttackTypes.light);
-                _button.interactable = false;
-            })
-            .AddTo(_disposable); 
-    }
-
-    private void FinishAttackDelay()
-    {
-        _onAttackDelayFinished.OnNext(1);
-        _button.interactable = true;
+        InitAttacksDelayEvents();
+        InitAttacksPerformEvents();
     }
 
     private void ReinitSettings()
@@ -126,7 +85,56 @@ public class AttackButtonPresenter : MonoBehaviour
             })
             .AddTo(_disposable);
     }
-    
+
+    private void InitAttacksDelayEvents()
+    {
+        _onAttackPerform
+            .Where(x => x == AttackTypes.light)
+            .Throttle(TimeSpan.FromMilliseconds(_AttackDelayLight))
+            .Subscribe(x => { FinishAttackDelay(); })
+            .AddTo(_disposable);
+
+        _onAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Throttle(TimeSpan.FromMilliseconds(_AttackDelayHeavy))
+            .Subscribe(x => { FinishAttackDelay(); })
+            .AddTo(_disposable);
+    }
+
+    private void FinishAttackDelay()
+    {
+        _onAttackDelayFinished.OnNext(1);
+        _button.interactable = true;
+    }
+
+    private void InitAttacksPerformEvents()
+    {
+        _clickCounter
+            .Where(x => x == 2)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(_AttackDelayHeavy))
+            .Subscribe(x =>
+            {
+                _clickCounter.Value = 0;
+                _onAttackPerform.OnNext(AttackTypes.heavy);
+                _button.interactable = false;
+            })
+            .AddTo(_disposable);
+
+
+        _clickCounter
+            .Where(x => x > 0)
+            .Buffer(_clickCounter.Where(x => x > 0).Throttle(TimeSpan.FromMilliseconds(_DoubleClickDelay)))
+            .Where(x => x.Count < 2)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(_AttackDelayLight))
+            .Subscribe(x =>
+            {
+                _clickCounter.Value = 0;
+                _onAttackPerform.OnNext(AttackTypes.light);
+                _button.interactable = false;
+            })
+            .AddTo(_disposable);
+    }
+
 
     public void OnClick()
     {

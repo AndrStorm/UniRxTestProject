@@ -39,53 +39,14 @@ public class AttackListener : IInitializable, IDisposable
         ReinitSettings();
 #endif
         
-        _attackButtonPresenter.OnAttackPerform
-            .Where(x => x == AttackTypes.light)
-            .Subscribe(x =>
-            {
-                _player.Animator.SetBool(IsLightAttack, true);
-            })
-            .AddTo(_disposable);
-        
-        _attackButtonPresenter.OnAttackPerform
-            .Where(x => x == AttackTypes.light)
-            .Throttle(TimeSpan.FromMilliseconds(_LightAttackVfxDelay))
-            .Subscribe(x =>
-            {
-                _vfxManager.PlayLightAttackVfx();
-                _player.Animator.SetBool(IsLightAttack, false);
-                
-            })
-            .AddTo(_disposable);
-        
-        
-        _attackButtonPresenter.OnAttackPerform
-            .Where(x => x == AttackTypes.heavy)
-            .Subscribe(x =>
-            {
-                _player.Animator.SetBool(IsHeavyAttack, true);
-            })
-            .AddTo(_disposable);
-        
-        _attackButtonPresenter.OnAttackPerform
-            .Where(x => x == AttackTypes.heavy)
-            .Throttle(TimeSpan.FromMilliseconds(_HeavyAttackVfxDelay))
-            .Subscribe(x =>
-            {
-                _vfxManager.PlayHeavyAttackVfx();
-                _player.Animator.SetBool(IsHeavyAttack, false);
-            })
-            .AddTo(_disposable);
-        
+        InitLightAttack();
+        InitHeavyAttack();
         
         _attackButtonPresenter.OnAttackPressed
-            .Subscribe(x =>
-            {
-                _vfxManager.PlayAttackPressedVfx();
-            })
+            .Subscribe(x => _vfxManager.PlayAttackPressedVfx())
             .AddTo(_disposable);
     }
-    
+
     private void ReinitSettings()
     {
         _attackButtonPresenter.OnAttackPerform
@@ -106,6 +67,49 @@ public class AttackListener : IInitializable, IDisposable
             })
             .AddTo(_disposable);
         
+    }
+
+    private void InitLightAttack()
+    {
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.light)
+            .Subscribe(x =>
+            {
+                _player.Animator.SetBool(IsLightAttack, true);
+            })
+            .AddTo(_disposable);
+
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.light)
+            .Throttle(TimeSpan.FromMilliseconds(_LightAttackVfxDelay))
+            .Subscribe(x =>
+            {
+                _vfxManager.PlayLightAttackVfx();
+                _player.Animator.SetBool(IsLightAttack, false);
+                
+            })
+            .AddTo(_disposable);
+    }
+
+    private void InitHeavyAttack()
+    {
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Subscribe(x =>
+            {
+                _player.Animator.SetBool(IsHeavyAttack, true);
+            })
+            .AddTo(_disposable);
+
+        _attackButtonPresenter.OnAttackPerform
+            .Where(x => x == AttackTypes.heavy)
+            .Throttle(TimeSpan.FromMilliseconds(_HeavyAttackVfxDelay))
+            .Subscribe(x =>
+            {
+                _vfxManager.PlayHeavyAttackVfx();
+                _player.Animator.SetBool(IsHeavyAttack, false);
+            })
+            .AddTo(_disposable);
     }
 
     public void Dispose()

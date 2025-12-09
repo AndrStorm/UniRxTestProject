@@ -12,9 +12,7 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
     public GameObject highlightVfx;
     public UIParticleSystem  highlightVfxPs;
     
-    
     private AttackButtonPresenter _attackButtonPresenter;
-    private IDisposable _disposable;
     private GameSettingsSO _settings;
     
     private int _HighlightOnInterval;
@@ -24,7 +22,9 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
     
     
     private static readonly int _tintColor = Shader.PropertyToID("_TintColor");
-    
+
+    private readonly CompositeDisposable _compositeDisposable = new();
+    private IDisposable _disposable;
     private Color _highlightVfxColor;
     private bool _isPointerOverButton;
 
@@ -46,21 +46,27 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
     }
     
 
+    
     private void Awake()
     {
         _highlightVfxColor =  highlightVfxPs.material.GetColor(_tintColor);
-
         _attackButtonPresenter = GetComponent<AttackButtonPresenter>();
+        
         _attackButtonPresenter.OnAttackDelayFinished.Subscribe(x =>
-        {
-            if (_isPointerOverButton) HighlightOn();
-        });
+        { if (_isPointerOverButton) HighlightOn();}).AddTo(_compositeDisposable);
 
         _attackButtonPresenter.OnAttackPerform.Subscribe(x =>
-        {
-            HighlightOff(_HighlightOffPressedMul);
-        });
+        { HighlightOff(_HighlightOffPressedMul);}).AddTo(_compositeDisposable);
     }
+    
+    private void OnDestroy()
+    {
+        _compositeDisposable.Dispose();
+        _disposable?.Dispose();
+        _highlightVfxColor.a = 1f;
+        highlightVfxPs.material.SetColor(_tintColor, _highlightVfxColor);
+    }
+    
     
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -71,7 +77,6 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
         HighlightOn();
         _isPointerOverButton = true;
     }
-
     
     public void OnPointerExit(PointerEventData eventData)
     {
@@ -81,7 +86,7 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
         HighlightOff();
         _isPointerOverButton = false;
     }
-
+    
     private void HighlightOn()
     {
         _disposable?.Dispose();
@@ -116,12 +121,5 @@ public class ButtonHighlightVfx : MonoBehaviour, IPointerEnterHandler, IPointerE
 
                 highlightVfxPs.material.SetColor(_tintColor, _highlightVfxColor);
             });
-    }
-
-    private void OnDestroy()
-    {
-        _disposable?.Dispose();
-        _highlightVfxColor.a = 1f;
-        highlightVfxPs.material.SetColor(_tintColor, _highlightVfxColor);
     }
 }
